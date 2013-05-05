@@ -1,0 +1,11 @@
+name: excalibur
+main: com.my64k.kew.excalibur.Excalibur
+version: 0.2
+
+
+commands:
+   excalibur:
+      description: This is a demo command.
+      usage: /<command> [player]
+#      permission: <plugin name>.basic
+#      permission-message: You don't have <permission>
