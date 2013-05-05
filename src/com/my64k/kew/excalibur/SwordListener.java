@@ -543,7 +543,7 @@ public class SwordListener implements Listener {
     	//plugin.Report("swordPickedUp- exit");
     }    
     
-    
+    /*
     @EventHandler
     public void swordReleased(PlayerDropItemEvent event) {
 	
@@ -564,32 +564,10 @@ public class SwordListener implements Listener {
     	}
 	    	
     	
-    	/*
-    	//
-    	// If the sword and the thing being dropped are the same.. 
-    	if (plugin.isItemStackExcalibur(event.getItemDrop().getItemStack()))	    	
-    	{
-    		//
-    		// This handles the transition from tracking in the inventory to tracking in the world
-    		//
-    		
-    		
-    		
-    		//this.plugin.getLogger().info("Our sword has been dropped.");	    		
-    		
-    		// BUT... the sword is now back in the World - so we start tracking its Entity
-    		Item sword = event.getItemDrop();
-    		
-    		//this.plugin.getLogger().info("Our sword id is now " + sword.getEntityId());
-    		
-    		this.plugin.swordReleasedByPlayer(event.getPlayer(),sword);
-    		
-    	}
-    	*/
     	//plugin.Report("swordDropped- exit");
     	
     }  
-    
+    */
     /*
     @EventHandler
     public void swordInventoryPickup(InventoryPickupItemEvent event) {

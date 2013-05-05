@@ -216,10 +216,10 @@ public final class Excalibur extends JavaPlugin
     	this.player = null;
     	// and start tracking the sword
     	this.sword = sword;
-    	this.getServer().broadcastMessage(player.getName() + " has accidentally dropped Excalibur.");
+    	this.getServer().broadcastMessage(player.getName() + " has dropped Excalibur.");
     }
 
-    
+    /*
     public void swordReleasedByPlayer(Player player,Item sword)
     {
     	// Forget who has Excalibur
@@ -229,6 +229,7 @@ public final class Excalibur extends JavaPlugin
     	
     	this.getServer().broadcastMessage(player.getName() + " has dropped Excalibur on purpose.");
     }
+    */
     
     public void swordWieldedByPlayer(Player player)
     {
