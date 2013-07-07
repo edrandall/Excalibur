@@ -3,6 +3,7 @@ package com.my64k.kew.excalibur;
 
 //Include the bukkit libraries so we can do bukkit stuff
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -41,6 +42,12 @@ public final class Excalibur extends JavaPlugin
 	// This is the name of our plugin
 	static String commandName = "excalibur";
 	
+	// The name of excalibur
+	public static final String swordName = "\u00A7l\u00A76Excalibur\u00A7r";		
+		
+	// The lore of excalibur
+	public static final String swordLore = "This is the sword of \u00A7lKing Arthur\u00A7r.";
+	    	
 	// Our spawn location for the sword
 	Location spawnLocation = null;
 	
@@ -56,14 +63,169 @@ public final class Excalibur extends JavaPlugin
 	// This is our SwordListener. It listens for events around the sword.
 	SwordListener swordListener = null;
 	
-	// The name of excalibur
-	public static final String swordName = "\u00A7l\u00A76Excalibur\u00A7r";
+	// How long we should wait for
+	int voteMaxTimeSeconds = 30;//60*5;
+	
+	// At what point our vote started
+	Date voteTimeStarted = null;
+	
+	public enum Mode
+	{
+		Attract, // We are inviting players to play
+		Vote,    // We are starting a vote to play
+		Running, // We are running.	
+	}
+	
+	// This is our current mode....	
+	public Mode mode = Mode.Attract;
+	
+	// send the standard startup message to player
+	public void greet(Player player)
+	{
+		
+		player.sendMessage("\u00A74This server is running \u00A75*" + swordName + "\u00A75*");
+		player.sendMessage("\u00A74Written by Kew2001 and DrMiaow .");
+		player.sendMessage("\u00A74");
+		
+		switch(mode)
+		{
+			case Attract:
+			{
+				player.sendMessage("\u00A74To start a game type the command.");			
+				player.sendMessage("\u00A74\u00A7f/excalibur start");
+			}
+			break;
+			
+			case Vote:
+			{
+				player.sendMessage("\u00A74There is a vote in progress to start a game.");
+				player.sendMessage("\u00A74To vote to join this game type the command.");			
+				player.sendMessage("\u00A74\u00A7f/excalibur vote");
+			}
+			break;		
+
+			case Running:
+			{
+				player.sendMessage("\u00A74There is a game in progress.");
+				player.sendMessage("\u00A74To join this game type the command.");			
+				player.sendMessage("\u00A74\u00A7f/excalibur join");
+			}
+			break;		
+			
+		}
+		
+		
+		player.sendMessage("\u00A74");		
+	}
 	
 	
-	// The lore of excalibur
-    public static final String swordLore = "This is the sword of \u00A7lKing Arthur\u00A7r.";
+	
+	void startVote()
+	{
+		mode = Mode.Vote;
+		
+		// This will record when we started the vote
+		voteTimeStarted = new Date();
+		
+	}
+	
+
+	int voteDurationSeconds()
+	{
+		// get 'now'
+		Date now = new Date();
+		
+		long diffMs = now.getTime() -  voteTimeStarted.getTime();
+		
+		return (int)(diffMs/1000);
+	}
+	
+	int voteTimeLeftSeconds()
+	{
+		return voteMaxTimeSeconds - voteDurationSeconds();
+	}	
+	
+	
+	
+	
+	
+	void voteCountDown()
+	{
+		this.getServer().broadcastMessage("Vote will expire in " + voteTimeLeftSeconds() + " seconds.");
+	}
+	
+    // If this returns true the player is an op.
+    // This will output a warning if the player is not an op
+    void startGame(CommandSender sender)
+    {
+    	switch(mode)
+		{
+			case Attract:
+			{
+				
+				// start the vote..
+				startVote();
+												
+				this.getServer().broadcastMessage(sender.getName() + " has started a vote to play " + swordName + ".");
+				
+				// Give the countdown...
+				voteCountDown();
+				
+			}
+			break;
+			
+			case Vote:
+			{
+				sender.sendMessage("\u00A74There is already a vote being held..");
+			}
+			break;		
+
+			case Running:
+			{										
+				sender.sendMessage("\u00A74There is already a game running");
+			}
+			break;		
+			
+		}    	
+    }	
     
-    
+    // If this returns true the player is an op.
+    // This will output a warning if the player is not an op
+    void status(CommandSender sender)
+    {
+    	switch(mode)
+		{
+			case Attract:
+			{
+				sender.sendMessage("\u00A74There is no " + swordName + "\u00A74 game running.");								
+			}
+			break;
+			
+			case Vote:
+			{
+				sender.sendMessage("\u00A74There is a vote being held to start a game of " + swordName + ".");
+				
+				if(voteTimeLeftSeconds() < 0)
+				{
+					sender.sendMessage("\u00A74Vote has expired.");
+				}
+				else 
+				{
+					sender.sendMessage("\u00A74Vote will expire in \u00A7f" + voteTimeLeftSeconds() + "\u00A74 seconds.");
+				}
+				
+			}
+			break;		
+
+			case Running:
+			{										
+				sender.sendMessage("\u00A74There is a game of " + swordName + "\u00A74 underway.");
+			}
+			break;		
+			
+		}    	
+    }	    
+	
     // Report on the status of the sword
     public void Report(String name)
     {
@@ -341,6 +503,31 @@ public final class Excalibur extends JavaPlugin
 		
     }
     
+    // If this returns true the player is an op.
+    // This will output a warning if the player is not an op
+    boolean playerMustBeOp(CommandSender sender)
+    {
+    	// If this is a player we need to test that it is an op 
+    	if (sender instanceof Player) 
+    	{   
+    		// Get a reference to the player object
+    		Player player = (Player)sender;
+    	
+    		// test that it is an op
+	    	if (!player.isOp())
+	    	{
+	    		// Warn if it is not 
+	    		player.sendMessage("You must be an op to do that.");
+	    		
+	    		// return false to signify that the command should not be run
+	    		return false;
+	    	}	    	
+    	}
+    	
+    	// CODE GOES HERE
+    	return true;        	
+    }
+    
     // This is where we put out setSpawn command
     void setSpawn(CommandSender sender)
     {
@@ -399,7 +586,7 @@ public final class Excalibur extends JavaPlugin
     			//v.zero();
     			    			
     			
-    			
+    			/*
     			  //replace the sword with a fireball
     			this.sword = (Item)this.spawnLocation.getWorld().spawnEntity(spawnLocation,EntityType.FIREBALL);
     			
@@ -408,7 +595,7 @@ public final class Excalibur extends JavaPlugin
     			
     			// Make it super powerful
     			fireball.setYield(500f);
-    			
+    		*/	
     			
     		
     		}
@@ -440,22 +627,42 @@ public final class Excalibur extends JavaPlugin
     			{
     				sender.sendMessage("u will go BOOM");
     			}
+    			
     			else
-    			if (args[0].equalsIgnoreCase("setspawn"))
+    				
+    			if (args[0].equalsIgnoreCase("setspawn"))    			
     			{
-    				this.setSpawn(sender);
+					if (playerMustBeOp(sender))
+					{					    				
+						this.setSpawn(sender);
+					}
     			}
     			else
+    			if (args[0].equalsIgnoreCase("start"))
+    			{															    		
+					this.startGame(sender);
+    			}
+    			else
+    			if (args[0].equalsIgnoreCase("status"))
+    			{															    		
+					this.status(sender);
+    			}
+    			else    				
 				if (args[0].equalsIgnoreCase("spawn"))
     			{
-					
-					if(spawnLocation == null)
-					{
-						sender.sendMessage("Spawn point has not been set. To set the spawn point, type: /excalibur setspawn");
-					}
-					else
-					{						
-						spawnSword();
+					// to use this command you must be an op.
+					if (playerMustBeOp(sender))
+					{					
+						// so if we get here we must be an op..
+						
+						if(spawnLocation == null)
+						{
+							sender.sendMessage("Spawn point has not been set. To set the spawn point, type: /excalibur setspawn");
+						}
+						else
+						{						
+							spawnSword();
+						}
 					}
         		}
     				

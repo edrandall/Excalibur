@@ -56,7 +56,9 @@ public class SwordListener implements Listener {
 		// remove excalibur - just in case
 		plugin.removeExcaliburFromPlayer(event.getPlayer());
 		
-		event.getPlayer().sendMessage("*MAKE OFFER TO PLAY EXCALIBUR*");
+		// send the standard greeting
+		plugin.greet(event.getPlayer());
+		
     }    	
 
 	@EventHandler
@@ -229,12 +231,11 @@ public class SwordListener implements Listener {
     @EventHandler
     public void swordDespawn(ItemDespawnEvent event) {
     	
-    	//plugin.Report("swordDespawn- enter");
+    	plugin.Report("swordDespawn- enter");
     	
-    	//this.plugin.getLogger().info("Something has despawned? " + event.getEntity().getUniqueId());    	
-    	//this.plugin.getLogger().info("This entity has despawned " + event.getEntity().getEntityId());    	
-    	    	
-    	//this.plugin.getLogger().info("This entity has despawned " + event.getEntity().getMetadata("name"));
+    	this.plugin.getLogger().info("Something has despawned? " + event.getEntity().getUniqueId());    	
+    	this.plugin.getLogger().info("This entity has despawned " + event.getEntity().getEntityId());    	    	    	
+    	this.plugin.getLogger().info("This entity has despawned " + event.getEntity().getMetadata("name"));
     	
 
     	// We only care and it is only safe, if we have a sword in play..
