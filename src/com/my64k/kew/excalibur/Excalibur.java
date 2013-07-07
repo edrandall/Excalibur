@@ -399,8 +399,8 @@ public final class Excalibur extends JavaPlugin
     			//v.zero();
     			    			
     			
-    			/*
-    			//  replace the sword with a fireball
+    			
+    			  //replace the sword with a fireball
     			this.sword = (Item)this.spawnLocation.getWorld().spawnEntity(spawnLocation,EntityType.FIREBALL);
     			
     			// Set as fireball so we can do fireball things to it
@@ -408,7 +408,7 @@ public final class Excalibur extends JavaPlugin
     			
     			// Make it super powerful
     			fireball.setYield(500f);
-    			*/
+    			
     			
     		
     		}
