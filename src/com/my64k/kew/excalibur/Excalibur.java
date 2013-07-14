@@ -38,6 +38,14 @@ import org.bukkit.util.Vector;
 //
 public final class Excalibur extends JavaPlugin 
 {
+	
+	// Constructor
+	public Excalibur()
+	{
+	}
+	
+	// Our tick schedule
+	public int schedule = 0;
 
 	// This is the name of our plugin
 	static String commandName = "excalibur";
@@ -78,6 +86,69 @@ public final class Excalibur extends JavaPlugin
 	
 	// This is our current mode....	
 	public Mode mode = Mode.Attract;
+	
+	// How many ticks have we run;
+	long ticks = 0;
+	
+	
+	// This code runs every time we get a timer update from minecraft.
+	public void tick()
+	{		
+		//this.getServer().broadcastMessage("tick");
+		
+		
+		switch(mode)
+		{
+			case Attract:
+			{
+				if ((ticks % (60L*30L)) == 0)
+				{
+					this.getServer().broadcastMessage("\u00A74This server is running \u00A75*" + swordName + "\u00A75*");
+					this.getServer().broadcastMessage("\u00A74Written by Kew2001 and DrMiaow .");
+					this.getServer().broadcastMessage("\u00A74");				
+					this.getServer().broadcastMessage("\u00A74To start a game type the command.");			
+					this.getServer().broadcastMessage("\u00A74\u00A7f/excalibur start");
+				}
+			}
+			break;
+			
+			case Vote:
+			{
+				if (voteTimeLeftSeconds() < 0)
+				{
+					this.getServer().broadcastMessage("\u00A74Vote has expired.");
+					endVote();
+				}
+				else				
+				if (voteTimeLeftSeconds() < 10)
+				{
+					voteCountDown();
+				}
+				else
+				if (voteTimeLeftSeconds() < 60)
+				{
+					if (voteTimeLeftSeconds() % 10 == 0)
+					{
+						voteCountDown();
+					}
+				}
+				
+			}
+			break;		
+
+			case Running:
+			{
+				this.getServer().broadcastMessage("\u00A74There is a game in progress.");
+				this.getServer().broadcastMessage("\u00A74To join this game type the command.");			
+				this.getServer().broadcastMessage("\u00A74\u00A7f/excalibur join");
+			}
+			break;		
+			
+		}		
+	}
+	
+	
+	
 	
 	// send the standard startup message to player
 	public void greet(Player player)
@@ -120,12 +191,32 @@ public final class Excalibur extends JavaPlugin
 	
 	
 	
+	void endVote()
+	{
+		mode = Mode.Attract;
+	}
+	
 	void startVote()
 	{
+		
 		mode = Mode.Vote;
 		
 		// This will record when we started the vote
 		voteTimeStarted = new Date();
+		
+		if (schedule == 0)
+		{
+			schedule = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, 				
+			new Runnable() 
+			{			
+				public void run() 
+				{				  
+					tick();	
+					ticks++;
+				}			  	
+			},
+			0,20);
+		}
 		
 	}
 	
@@ -169,7 +260,7 @@ public final class Excalibur extends JavaPlugin
 				this.getServer().broadcastMessage(sender.getName() + " has started a vote to play " + swordName + ".");
 				
 				// Give the countdown...
-				voteCountDown();
+				//voteCountDown();
 				
 			}
 			break;
